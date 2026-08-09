@@ -37,10 +37,10 @@ export default function App() {
     <div style={themeStyles}>
       <Header name="Neer Patel" themeColor="#1d4ed8" />
       <Navbar />
-      
+
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
-        <button 
-          onClick={() => setIsDarkMode(!isDarkMode)} 
+        <button
+          onClick={() => setIsDarkMode(!isDarkMode)}
           style={{ cursor: 'pointer', padding: '0.5rem 1rem', borderRadius: '4px' }}
         >
           {isDarkMode ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode'}
@@ -55,7 +55,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      
+
       <Footer />
     </div>
   );

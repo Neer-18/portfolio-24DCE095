@@ -4,7 +4,7 @@ export default function Projects() {
     const [repos, setRepos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
+
     // Controlled inputs & active fetch targets
     const [searchTerm, setSearchTerm] = useState('');
     const [usernameInput, setUsernameInput] = useState('Neer-18');
@@ -89,7 +89,7 @@ export default function Projects() {
                             }
                         }}
                     />
-                    <button 
+                    <button
                         className="btn-primary"
                         onClick={() => setActiveUsername(usernameInput)}
                         disabled={loading}
@@ -161,7 +161,7 @@ export default function Projects() {
                                             </h3>
                                             <span className="star-badge" title="GitHub Stars">
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.21l8.2-1.192z"/>
+                                                    <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.21l8.2-1.192z" />
                                                 </svg>
                                                 {repo.stargazers_count}
                                             </span>
