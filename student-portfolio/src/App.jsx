@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Navbar from './components/Navbar';
@@ -9,12 +9,24 @@ import NotFound from './components/NotFound';
 import Footer from './components/Footer';
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Initialize state based on system color scheme preference
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
-  // Dynamic styles based on state
+  // Synchronize CSS class with dark mode state
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  // Dynamic styles utilizing theme variables
   const themeStyles = {
-    backgroundColor: isDarkMode ? '#121212' : '#ffffff',
-    color: isDarkMode ? '#e2e8f0' : '#0f172a',
+    backgroundColor: 'var(--bg)',
+    color: 'var(--text)',
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
