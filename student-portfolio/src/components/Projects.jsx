@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const GITHUB_USERNAME = 'Neer-18';
+
 export default function Projects() {
     const [repos, setRepos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -7,20 +9,14 @@ export default function Projects() {
 
     // Controlled inputs & active fetch targets
     const [searchTerm, setSearchTerm] = useState('');
-    const [usernameInput, setUsernameInput] = useState('Neer-18');
-    const [activeUsername, setActiveUsername] = useState('Neer-18');
-    const [simulateError, setSimulateError] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
 
-    // Fetch repositories with rate limit consideration & error simulation
+    // Fetch repositories with rate limit consideration
     useEffect(() => {
         setLoading(true);
         setError(null);
 
-        // Break API URL intentionally if simulation checkbox is ticked
-        const apiUrl = simulateError
-            ? `https://api.github.com/users/${activeUsername}/repos-non-existent-simulate-error`
-            : `https://api.github.com/users/${activeUsername}/repos`;
+        const apiUrl = `https://api.github.com/users/${GITHUB_USERNAME}/repos`;
 
         fetch(apiUrl)
             .then((res) => {
@@ -44,7 +40,7 @@ export default function Projects() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [activeUsername, simulateError, retryCount]);
+    }, [retryCount]);
 
     // Local client-side filtering based on name matching
     const filteredRepos = repos.filter((repo) =>
@@ -64,8 +60,8 @@ export default function Projects() {
             </p>
 
             {/* Dashboard Control Bar */}
-            <div className="controls-container">
-                <div className="control-group">
+            <div className="controls-container" style={{ justifyContent: 'center' }}>
+                <div className="control-group" style={{ width: '100%', maxWidth: '500px' }}>
                     <input
                         type="text"
                         className="input-field"
@@ -73,40 +69,8 @@ export default function Projects() {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         disabled={loading || error !== null}
+                        style={{ width: '100%', padding: '0.6rem 1rem' }}
                     />
-                </div>
-
-                <div className="control-group">
-                    <input
-                        type="text"
-                        className="input-field"
-                        placeholder="GitHub Username"
-                        value={usernameInput}
-                        onChange={(e) => setUsernameInput(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                setActiveUsername(usernameInput);
-                            }
-                        }}
-                    />
-                    <button
-                        className="btn-primary"
-                        onClick={() => setActiveUsername(usernameInput)}
-                        disabled={loading}
-                    >
-                        Load User
-                    </button>
-                </div>
-
-                <div className="control-group">
-                    <label className="toggle-label">
-                        <input
-                            type="checkbox"
-                            checked={simulateError}
-                            onChange={(e) => setSimulateError(e.target.checked)}
-                        />
-                        Simulate API Error
-                    </label>
                 </div>
             </div>
 
@@ -115,7 +79,7 @@ export default function Projects() {
                 <div className="spinner-container">
                     <div className="spinner"></div>
                     <p style={{ fontWeight: '500', color: 'var(--text-h)' }}>
-                        Fetching repositories for "{activeUsername}"...
+                        Fetching repositories for "{GITHUB_USERNAME}"...
                     </p>
                 </div>
             ) : error ? (
@@ -128,7 +92,7 @@ export default function Projects() {
                     </h3>
                     <p className="error-message">{error}</p>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text)', marginBottom: '1.5rem' }}>
-                        Ensure your internet connection is active, the username is correct, or uncheck "Simulate API Error" before retrying.
+                        Ensure your internet connection is active or try again later.
                     </p>
                     <button className="btn-retry" onClick={handleRetry}>
                         🔄 Try Again
@@ -139,7 +103,7 @@ export default function Projects() {
                     <h2 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>Public Repositories ({filteredRepos.length})</span>
                         <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: 'var(--text)' }}>
-                            Active User: <strong style={{ color: 'var(--accent)' }}>{activeUsername}</strong>
+                            GitHub: <strong style={{ color: 'var(--accent)' }}>{GITHUB_USERNAME}</strong>
                         </span>
                     </h2>
 
@@ -147,7 +111,7 @@ export default function Projects() {
                         <div className="repo-grid">
                             <div className="no-results">
                                 <p style={{ fontSize: '1.1rem', fontWeight: '500', margin: '0 0 0.5rem 0' }}>No projects match your search.</p>
-                                <p style={{ fontSize: '0.9rem', margin: 0 }}>Try clearing the search query or search a different user's repositories.</p>
+                                <p style={{ fontSize: '0.9rem', margin: 0 }}>Try clearing the search query.</p>
                             </div>
                         </div>
                     ) : (
