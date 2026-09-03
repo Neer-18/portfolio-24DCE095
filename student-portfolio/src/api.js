@@ -5,6 +5,19 @@
 const BASE_URL = 'http://localhost:5000';
 
 /**
+ * Safe fetch wrapper that catches network/connection dropouts
+ */
+async function safeFetch(url, options = {}) {
+    try {
+        return await fetch(url, options);
+    } catch (err) {
+        throw new Error(
+            "Network Error: Failed to connect to server on http://localhost:5000. Ensure the Express backend is running."
+        );
+    }
+}
+
+/**
  * Helper to handle fetch responses and parse error messages
  */
 async function handleResponse(response) {
@@ -34,7 +47,7 @@ async function handleResponse(response) {
  * GET /tasks
  */
 export async function getTasks() {
-    const response = await fetch(`${BASE_URL}/tasks`);
+    const response = await safeFetch(`${BASE_URL}/tasks`);
     return handleResponse(response);
 }
 
@@ -43,7 +56,7 @@ export async function getTasks() {
  * GET /tasks/:id
  */
 export async function getTaskById(id) {
-    const response = await fetch(`${BASE_URL}/tasks/${id}`);
+    const response = await safeFetch(`${BASE_URL}/tasks/${id}`);
     return handleResponse(response);
 }
 
@@ -52,7 +65,7 @@ export async function getTaskById(id) {
  * POST /tasks
  */
 export async function createTask(taskData) {
-    const response = await fetch(`${BASE_URL}/tasks`, {
+    const response = await safeFetch(`${BASE_URL}/tasks`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -67,7 +80,7 @@ export async function createTask(taskData) {
  * PUT /tasks/:id
  */
 export async function updateTask(id, updateData) {
-    const response = await fetch(`${BASE_URL}/tasks/${id}`, {
+    const response = await safeFetch(`${BASE_URL}/tasks/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -82,7 +95,7 @@ export async function updateTask(id, updateData) {
  * DELETE /tasks/:id
  */
 export async function deleteTask(id) {
-    const response = await fetch(`${BASE_URL}/tasks/${id}`, {
+    const response = await safeFetch(`${BASE_URL}/tasks/${id}`, {
         method: 'DELETE'
     });
     return handleResponse(response);

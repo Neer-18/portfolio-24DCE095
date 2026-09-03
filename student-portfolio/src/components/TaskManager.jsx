@@ -115,7 +115,7 @@ export default function TaskManager() {
             setTasks((prev) => prev.filter((t) => t._id !== tempId));
             setNewTitle(trimmedTitle);
             setNewDescription(trimmedDesc);
-            showToast('error', `Server rejected task creation: ${err.message}`);
+            showToast('error', err.message);
         } finally {
             setIsSubmitting(false);
         }
