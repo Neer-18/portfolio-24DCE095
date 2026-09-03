@@ -216,11 +216,15 @@ export default function TaskManager() {
 
             {/* Header / Intro */}
             <div className="task-header-block">
-                <span className="p6-badge">Practical 6: Full Stack Integration</span>
-                <h1 style={{ margin: '0.5rem 0', lineHeight: 1.2 }}>Full Stack Task Manager</h1>
-                <p style={{ color: 'var(--text)', margin: '0 0 1.75rem 0', fontSize: '1rem' }}>
-                    Connected live to Express API (<code>http://localhost:5000/tasks</code>) &amp; MongoDB Atlas.
-                    Changes are persisted in the cloud database.
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                    <span className="cloud-status-pill">
+                        <span className="status-dot"></span>
+                        Cloud Synchronized
+                    </span>
+                </div>
+                <h1 style={{ margin: '0 0 0.5rem 0', lineHeight: 1.2 }}>Task Manager</h1>
+                <p style={{ color: 'var(--text)', margin: '0 auto 2rem auto', fontSize: '1.05rem', maxWidth: '580px', lineHeight: 1.5 }}>
+                    Plan, organize, and prioritize your development workflow with live MongoDB cloud synchronization.
                 </p>
             </div>
 
@@ -242,8 +246,8 @@ export default function TaskManager() {
 
             {/* Task Creation Form Card */}
             <div className="task-form-card">
-                <h2 style={{ fontSize: '1.25rem', margin: '0 0 1rem 0', textAlign: 'left', color: 'var(--text-h)' }}>
-                    ➕ Add New Task
+                <h2 style={{ fontSize: '1.2rem', margin: '0 0 1.25rem 0', textAlign: 'left', color: 'var(--text-h)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span>➕</span> Create New Task
                 </h2>
                 <form onSubmit={handleCreateTask} className="task-form">
                     <div className="form-row">
@@ -251,7 +255,7 @@ export default function TaskManager() {
                             <input
                                 type="text"
                                 className="input-field"
-                                placeholder="What needs to be done? (e.g. Wire React to MongoDB)"
+                                placeholder="Task title (e.g. Design responsive navbar)"
                                 value={newTitle}
                                 onChange={(e) => setNewTitle(e.target.value)}
                                 disabled={isSubmitting}
@@ -272,12 +276,12 @@ export default function TaskManager() {
                         </div>
                     </div>
 
-                    <div className="form-row" style={{ marginTop: '0.75rem' }}>
-                        <div style={{ flex: 1 }}>
+                    <div className="form-row" style={{ marginTop: '0.85rem' }}>
+                        <div style={{ flex: 1, minWidth: '240px' }}>
                             <input
                                 type="text"
                                 className="input-field"
-                                placeholder="Optional description or details..."
+                                placeholder="Add optional notes, details, or acceptance criteria..."
                                 value={newDescription}
                                 onChange={(e) => setNewDescription(e.target.value)}
                                 disabled={isSubmitting}
@@ -287,9 +291,9 @@ export default function TaskManager() {
                             type="submit"
                             className="btn-primary"
                             disabled={isSubmitting || !newTitle.trim()}
-                            style={{ minWidth: '130px' }}
+                            style={{ minWidth: '130px', height: '42px', justifyContent: 'center' }}
                         >
-                            {isSubmitting ? 'Adding...' : 'Add Task'}
+                            {isSubmitting ? 'Saving...' : 'Create Task'}
                         </button>
                     </div>
                 </form>

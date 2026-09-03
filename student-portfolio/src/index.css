@@ -388,21 +388,36 @@ code {
 }
 
 /* =========================================================
-   PRACTICAL 6: FULL STACK TASK MANAGER STYLES
+   TASK MANAGER WORKSPACE STYLES
    ========================================================= */
 
-.p6-badge {
-  display: inline-block;
+.cloud-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.8rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.25rem 0.75rem;
+  letter-spacing: 0.03em;
+  padding: 0.35rem 0.85rem;
   border-radius: 999px;
-  background: var(--accent-bg);
-  color: var(--accent);
-  border: 1px solid var(--accent-border);
-  margin-bottom: 0.5rem;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 .task-stats-bar {
@@ -457,6 +472,15 @@ code {
 .task-form {
   display: flex;
   flex-direction: column;
+}
+
+.task-form .input-field {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  height: 42px;
 }
 
 .form-row {
