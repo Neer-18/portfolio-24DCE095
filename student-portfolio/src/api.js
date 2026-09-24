@@ -1,15 +1,42 @@
 /**
- * Central API Client for Task Manager Backend (Practical 6)
+ * Central API Client for Task Manager Backend (Practicals 6 & 7)
  * Base URL: http://localhost:5000
+ * Handles JWT Token Persistence, Authorization Headers, and 401 Expiry Events
  */
 const BASE_URL = 'http://localhost:5000';
 
+export const getStoredToken = () => localStorage.getItem('jwt_token');
+export const setStoredToken = (token) => localStorage.setItem('jwt_token', token);
+export const removeStoredToken = () => localStorage.removeItem('jwt_token');
+
 /**
- * Safe fetch wrapper that catches network/connection dropouts
+ * Safe fetch wrapper that automatically attaches JWT Authorization header
+ * and catches network connection errors
  */
 async function safeFetch(url, options = {}) {
+    const headers = {
+        ...(options.headers || {})
+    };
+
+    // Attach JWT Bearer token if present
+    const token = getStoredToken();
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     try {
-        return await fetch(url, options);
+        const response = await fetch(url, {
+            ...options,
+            headers
+        });
+
+        // Supplementary Problem 2: Token expiry & tampering handling (401 & 403)
+        if (response.status === 401 || response.status === 403) {
+            removeStoredToken();
+            window.dispatchEvent(new CustomEvent('auth:expired'));
+        }
+
+        return response;
     } catch (err) {
         throw new Error(
             "Network Error: Failed to connect to server on http://localhost:5000. Ensure the Express backend is running."
@@ -42,8 +69,63 @@ async function handleResponse(response) {
     return response.json();
 }
 
+// ==========================================
+// --- AUTHENTICATION API (Practical 7) ---
+// ==========================================
+
 /**
- * Fetch all tasks from MongoDB
+ * Register a new user
+ * POST /register
+ */
+export async function registerUser(userData) {
+    const response = await safeFetch(`${BASE_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+    });
+    return handleResponse(response);
+}
+
+/**
+ * Log in an existing user and save token
+ * POST /login
+ */
+export async function loginUser(credentials) {
+    const response = await safeFetch(`${BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials)
+    });
+    const data = await handleResponse(response);
+    if (data.token) {
+        setStoredToken(data.token);
+    }
+    return data;
+}
+
+/**
+ * Fetch currently authenticated user's profile (Supplementary Problem 1)
+ * GET /me
+ */
+export async function getCurrentUser() {
+    const response = await safeFetch(`${BASE_URL}/me`);
+    return handleResponse(response);
+}
+
+/**
+ * Clear user token and log out (Supplementary Problem 3)
+ */
+export function logoutUser() {
+    removeStoredToken();
+    window.dispatchEvent(new CustomEvent('auth:logout'));
+}
+
+// ===================================
+// --- TASK CRUD API (Protected) ---
+// ===================================
+
+/**
+ * Fetch all tasks for authenticated user
  * GET /tasks
  */
 export async function getTasks() {
@@ -67,9 +149,7 @@ export async function getTaskById(id) {
 export async function createTask(taskData) {
     const response = await safeFetch(`${BASE_URL}/tasks`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskData)
     });
     return handleResponse(response);
@@ -82,9 +162,7 @@ export async function createTask(taskData) {
 export async function updateTask(id, updateData) {
     const response = await safeFetch(`${BASE_URL}/tasks/${id}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData)
     });
     return handleResponse(response);
@@ -102,6 +180,13 @@ export async function deleteTask(id) {
 }
 
 export default {
+    getStoredToken,
+    setStoredToken,
+    removeStoredToken,
+    registerUser,
+    loginUser,
+    getCurrentUser,
+    logoutUser,
     getTasks,
     getTaskById,
     createTask,
