@@ -10,8 +10,10 @@ import {
 } from '../api';
 import Toast from './Toast';
 import ConfirmModal from './ConfirmModal';
-import EditTaskModal from './EditTaskModal';
-import AuthModal from './AuthModal';
+
+// Practical 8 Supplementary: Code-split heavy interactive modals
+const EditTaskModal = React.lazy(() => import('./EditTaskModal'));
+const AuthModal = React.lazy(() => import('./AuthModal'));
 
 export default function TaskManager() {
     // Authentication state
@@ -627,21 +629,28 @@ export default function TaskManager() {
                 onCancel={() => setDeleteTarget(null)}
             />
 
-            {/* Task Edit Modal */}
-            <EditTaskModal
-                isOpen={Boolean(editTarget)}
-                task={editTarget}
-                onClose={() => setEditTarget(null)}
-                onSave={handleSaveEdit}
-                isSaving={isSavingEdit}
-            />
+            {/* Practical 8: Lazy-loaded Modals wrapped in Suspense */}
+            {editTarget && (
+                <React.Suspense fallback={null}>
+                    <EditTaskModal
+                        isOpen={Boolean(editTarget)}
+                        task={editTarget}
+                        onClose={() => setEditTarget(null)}
+                        onSave={handleSaveEdit}
+                        isSaving={isSavingEdit}
+                    />
+                </React.Suspense>
+            )}
 
-            {/* Authentication Modal (Login / Register) */}
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-                onAuthSuccess={handleAuthSuccess}
-            />
+            {isAuthModalOpen && (
+                <React.Suspense fallback={null}>
+                    <AuthModal
+                        isOpen={isAuthModalOpen}
+                        onClose={() => setIsAuthModalOpen(false)}
+                        onAuthSuccess={handleAuthSuccess}
+                    />
+                </React.Suspense>
+            )}
         </section>
     );
 }

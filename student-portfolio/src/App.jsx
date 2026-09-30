@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
+
+// Critical shell components kept static for immediate render
 import Header from './components/Header';
 import Navbar from './components/Navbar';
-import Home from './components/Home';
-import Projects from './components/Projects';
-import Contact from './components/Contact';
-import NotFound from './components/NotFound';
 import Footer from './components/Footer';
+import LoadingFallback from './components/LoadingFallback';
+
+// Practical 8: Route-based code-splitting with dynamic import()
+const Home = lazy(() => import('./components/Home'));
+const Projects = lazy(() => import('./components/Projects'));
+const Contact = lazy(() => import('./components/Contact'));
+const NotFound = lazy(() => import('./components/NotFound'));
 
 export default function App() {
   // Initialize state based on system color scheme preference
@@ -48,16 +53,20 @@ export default function App() {
       </div>
 
       <main style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<Projects />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {/* Suspense boundary renders fallback UI while lazy route chunk loads */}
+        <Suspense fallback={<LoadingFallback message="Loading page..." />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/tasks" element={<Projects />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
 
       <Footer />
     </div>
   );
 }
+
