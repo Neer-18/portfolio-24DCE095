@@ -179,6 +179,19 @@ export async function deleteTask(id) {
     return handleResponse(response);
 }
 
+/**
+ * Practical 13: Generate AI Task Description
+ * POST /api/ai/generate-description
+ */
+export async function generateAiDescription(title) {
+    const response = await safeFetch(`${BASE_URL}/api/ai/generate-description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title })
+    });
+    return handleResponse(response);
+}
+
 export default {
     getStoredToken,
     setStoredToken,
@@ -191,5 +204,6 @@ export default {
     getTaskById,
     createTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    generateAiDescription
 };

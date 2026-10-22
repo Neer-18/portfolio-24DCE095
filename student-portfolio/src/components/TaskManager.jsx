@@ -6,7 +6,8 @@ import {
     deleteTask,
     getCurrentUser,
     logoutUser,
-    getStoredToken
+    getStoredToken,
+    generateAiDescription
 } from '../api';
 import Toast from './Toast';
 import ConfirmModal from './ConfirmModal';
@@ -31,6 +32,8 @@ export default function TaskManager() {
     const [newDescription, setNewDescription] = useState('');
     const [newPriority, setNewPriority] = useState('medium');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+    const [aiDisclaimer, setAiDisclaimer] = useState('');
 
     // Search and filter controls
     const [searchTerm, setSearchTerm] = useState('');
@@ -133,6 +136,32 @@ export default function TaskManager() {
     // Handle Logout
     const handleLogoutClick = () => {
         logoutUser();
+    };
+
+    // Practical 13: Auto-generate AI task description with loading state & rate limit handling
+    const handleAutoGenerateAi = async () => {
+        const trimmedTitle = newTitle.trim();
+        if (!trimmedTitle) {
+            showToast('warning', 'Please enter a task title first to auto-generate a description.');
+            return;
+        }
+
+        setIsGeneratingAi(true);
+        try {
+            const res = await generateAiDescription(trimmedTitle);
+            if (res.description) {
+                setNewDescription(res.description);
+                if (res.suggestedPriority) {
+                    setNewPriority(res.suggestedPriority);
+                }
+                setAiDisclaimer(res.disclaimer || '🤖 AI-generated suggestion. Please review and modify before saving.');
+                showToast('success', res.fallback ? 'Applied smart template description.' : '✨ AI description auto-generated!');
+            }
+        } catch (err) {
+            showToast('error', err.message || 'AI generation failed. Please type manually.');
+        } finally {
+            setIsGeneratingAi(false);
+        }
     };
 
     // 4. Task Creation with OPTIMISTIC UI Update
@@ -424,14 +453,58 @@ export default function TaskManager() {
 
                         <div className="form-row" style={{ marginTop: '0.85rem' }}>
                             <div style={{ flex: 1, minWidth: '240px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                                    <label style={{ fontSize: '0.85rem', color: 'var(--text-h)', fontWeight: 500 }}>
+                                        Description:
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={handleAutoGenerateAi}
+                                        disabled={isGeneratingAi || !newTitle.trim()}
+                                        style={{
+                                            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                            color: '#ffffff',
+                                            border: 'none',
+                                            padding: '0.25rem 0.65rem',
+                                            borderRadius: '6px',
+                                            fontSize: '0.8rem',
+                                            fontWeight: 500,
+                                            cursor: isGeneratingAi || !newTitle.trim() ? 'not-allowed' : 'pointer',
+                                            opacity: isGeneratingAi || !newTitle.trim() ? 0.6 : 1,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.3rem',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                    >
+                                        {isGeneratingAi ? '⏳ Generating...' : '✨ Auto-Generate with AI'}
+                                    </button>
+                                </div>
                                 <input
                                     type="text"
                                     className="input-field"
-                                    placeholder="Add optional notes, details, or description..."
+                                    placeholder="Add optional notes, details, or click Auto-Generate with AI..."
                                     value={newDescription}
                                     onChange={(e) => setNewDescription(e.target.value)}
                                     disabled={isSubmitting}
                                 />
+                                {aiDisclaimer && (
+                                    <div style={{
+                                        marginTop: '0.45rem',
+                                        padding: '0.4rem 0.65rem',
+                                        borderRadius: '6px',
+                                        background: 'rgba(99, 102, 241, 0.08)',
+                                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                                        fontSize: '0.78rem',
+                                        color: 'var(--text-h)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.4rem'
+                                    }}>
+                                        <span>ℹ️</span>
+                                        <span>{aiDisclaimer}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
